@@ -11,6 +11,10 @@ A working face detection and recognition web app using **WebRTC** + **face-api.j
 - FPS counter and match confidence display
 - No backend server required - all processing happens in the browser
 
+## Live Demo
+
+**[https://jeanmachuca.github.io/modern-face-detection-app-example/](https://jeanmachuca.github.io/modern-face-detection-app-example/)**
+
 ## Quick Start
 
 ```bash
@@ -57,8 +61,8 @@ Click "Train from Images" to process these into face descriptors (stored in memo
 
 ## Related
 
-- **[facedetection-tutotial](https://github.com/jeanmachuca/facedetection-tutotial)** - Comprehensive tutorial comparing Flash vs Modern approaches
-- **[facerecognitioninbrowser](https://github.com/jeanmachuca/facerecognitioninbrowser)** - Original Flash-based project (legacy)
+- **[facedetection-tutotial](https://github.com/jeanmachuca/facedetection-tutotial)** — Comprehensive tutorial ([live](https://jeanmachuca.github.io/facedetection-tutotial/))
+- **[facerecognitioninbrowser](https://github.com/jeanmachuca/facerecognitioninbrowser)** — Original Flash project ([live](https://jeanmachuca.github.io/facerecognitioninbrowser/))
 
 ## License
 

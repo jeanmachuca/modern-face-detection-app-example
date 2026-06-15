@@ -1,0 +1,12 @@
+{
+    "name": "modern-face-detection-app-example",
+    "version": "1.0.0",
+    "description": "Modern face detection app using WebRTC + face-api.js + TensorFlow.js",
+    "private": true,
+    "scripts": {
+        "dev": "npx serve .",
+        "start": "npx serve ."
+    },
+    "keywords": ["face-detection", "facial-recognition", "webrtc", "tensorflowjs"],
+    "license": "MIT"
+}

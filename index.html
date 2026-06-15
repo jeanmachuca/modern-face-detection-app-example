@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Modern Face Detection App</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <div id="app">
+        <header>
+            <h1>Modern Face Detection App</h1>
+            <p class="subtitle">WebRTC + face-api.js + TensorFlow.js</p>
+        </header>
+
+        <div id="status-bar">
+            <span id="model-status">Loading models...</span>
+            <span id="camera-status">Camera: off</span>
+            <span id="fps-display">FPS: 0</span>
+        </div>
+
+        <div id="main-container">
+            <div id="video-container">
+                <video id="video" autoplay muted playsinline></video>
+                <canvas id="overlay"></canvas>
+                <div id="detection-info">
+                    <span id="face-count">No face detected</span>
+                    <span id="match-result"></span>
+                </div>
+            </div>
+
+            <div id="controls">
+                <button id="btn-camera" class="btn btn-primary" disabled>Start Camera</button>
+                <button id="btn-train" class="btn btn-secondary" disabled>Train from Images</button>
+                <button id="btn-clear" class="btn btn-danger" disabled>Clear Database</button>
+
+                <div class="control-group">
+                    <label for="model-select">Detection Model:</label>
+                    <select id="model-select">
+                        <option value="tinyFaceDetector">TinyFaceDetector (Fast)</option>
+                        <option value="ssdMobilenetv1" selected>SSD MobileNetV1 (Accurate)</option>
+                    </select>
+                </div>
+
+                <div class="control-group">
+                    <label for="threshold">Match Threshold: <span id="threshold-value">0.5</span></label>
+                    <input type="range" id="threshold" min="0.1" max="0.9" step="0.05" value="0.5">
+                </div>
+            </div>
+        </div>
+
+        <div id="training-section">
+            <h2>Training Data</h2>
+            <div id="image-gallery">
+                <p class="hint">Start camera and click "Train from Images" to process training images.</p>
+            </div>
+        </div>
+
+        <div id="log-section">
+            <h2>Log</h2>
+            <div id="log"></div>
+        </div>
+    </div>
+
+    <script type="module" src="src/app.js"></script>
+</body>
+</html>

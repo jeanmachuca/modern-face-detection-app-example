@@ -10,12 +10,12 @@ export class FaceDetector {
     async loadModels(modelType = 'ssdMobilenetv1') {
         this.currentModel = modelType;
         const model = modelType === 'tinyFaceDetector'
-            ? faceapi.nets.tinyFaceDetector
-            : faceapi.nets.ssdMobilenetv1;
+            ? globalThis.faceapi.nets.tinyFaceDetector
+            : globalThis.faceapi.nets.ssdMobilenetv1;
 
         await model.loadFromUri(MODEL_URL);
-        await faceapi.nets.faceLandmark68Net.loadFromUri(MODEL_URL);
-        await faceapi.nets.faceRecognitionNet.loadFromUri(MODEL_URL);
+        await globalThis.faceapi.nets.faceLandmark68Net.loadFromUri(MODEL_URL);
+        await globalThis.faceapi.nets.faceRecognitionNet.loadFromUri(MODEL_URL);
 
         this.modelsLoaded = true;
     }
@@ -24,10 +24,10 @@ export class FaceDetector {
         if (!this.modelsLoaded) return [];
 
         const useTiny = this.currentModel === 'tinyFaceDetector';
-        const detections = await faceapi
+        const detections = await globalThis.faceapi
             .detectAllFaces(input, useTiny
-                ? new faceapi.TinyFaceDetectorOptions({ inputSize: 320, scoreThreshold: 0.5 })
-                : new faceapi.SsdMobilenetv1Options({ minConfidence: 0.5 })
+                ? new globalThis.faceapi.TinyFaceDetectorOptions({ inputSize: 320, scoreThreshold: 0.5 })
+                : new globalThis.faceapi.SsdMobilenetv1Options({ minConfidence: 0.5 })
             )
             .withFaceLandmarks()
             .withFaceDescriptors();
@@ -38,8 +38,8 @@ export class FaceDetector {
     async getDescriptor(input) {
         if (!this.modelsLoaded) return null;
 
-        const result = await faceapi
-            .detectSingleFace(input, new faceapi.SsdMobilenetv1Options({ minConfidence: 0.5 }))
+        const result = await globalThis.faceapi
+            .detectSingleFace(input, new globalThis.faceapi.SsdMobilenetv1Options({ minConfidence: 0.5 }))
             .withFaceLandmarks()
             .withFaceDescriptor();
 
@@ -60,7 +60,7 @@ export class FaceDetector {
 
         for (const [label, descriptors] of Object.entries(this.labeledDescriptors)) {
             for (const ref of descriptors) {
-                const distance = faceapi.euclideanDistance(descriptor, ref);
+                const distance = globalThis.faceapi.euclideanDistance(descriptor, ref);
                 if (distance < bestDistance) {
                     bestDistance = distance;
                     bestMatch = label;

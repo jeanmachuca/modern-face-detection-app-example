@@ -112,7 +112,7 @@ class App {
             btn.textContent = 'Stop Camera';
             this.setCameraStatus('on');
             this.log('Camera started', 'success');
-            document.getElementById('btn-train').disabled = this.training.totalSamples === 0;
+            document.getElementById('btn-train').disabled = false;
             this.startDetection();
         } catch (error) {
             btn.textContent = 'Start Camera';

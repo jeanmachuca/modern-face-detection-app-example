@@ -2,6 +2,7 @@ export class TrainingManager {
     constructor(detector) {
         this.detector = detector;
         this.labeledDescriptors = {};
+        this.thumbnails = {};
     }
 
     get knownLabels() {
@@ -12,43 +13,56 @@ export class TrainingManager {
         return Object.values(this.labeledDescriptors).reduce((sum, arr) => sum + arr.length, 0);
     }
 
-    async processImages(imagePaths) {
-        const results = {};
-
-        for (const { path, label } of imagePaths) {
-            try {
-                const img = await this.loadImage(path);
-                const descriptor = await this.detector.getDescriptor(img);
-
-                if (descriptor) {
-                    if (!results[label]) results[label] = [];
-                    results[label].push({
-                        file: path.split('/').pop(),
-                        descriptor: Array.from(descriptor),
-                    });
-                }
-            } catch (e) {
-                console.warn(`Failed to process ${path}:`, e.message);
-            }
+    async captureFromVideo(videoElement, label) {
+        if (!label || !label.trim()) {
+            throw new Error('Enter a name before capturing.');
         }
 
-        this.labeledDescriptors = {};
-        for (const [label, embeddings] of Object.entries(results)) {
-            this.labeledDescriptors[label] = embeddings.map(e => new Float32Array(e.descriptor));
+        const canvas = document.createElement('canvas');
+        canvas.width = videoElement.videoWidth;
+        canvas.height = videoElement.videoHeight;
+        const ctx = canvas.getContext('2d');
+        ctx.drawImage(videoElement, 0, 0, canvas.width, canvas.height);
+
+        const descriptor = await this.detector.getDescriptor(canvas);
+        if (!descriptor) {
+            throw new Error('No face detected. Look at the camera and try again.');
         }
+
+        const trimmed = label.trim();
+        if (!this.labeledDescriptors[trimmed]) {
+            this.labeledDescriptors[trimmed] = [];
+        }
+        this.labeledDescriptors[trimmed].push(descriptor);
+
+        if (!this.thumbnails[trimmed]) {
+            this.thumbnails[trimmed] = [];
+        }
+        this.thumbnails[trimmed].push(canvas.toDataURL('image/jpeg', 0.6));
 
         this.detector.setTrainingData(this.labeledDescriptors);
-        return results;
+        return { label: trimmed, count: this.labeledDescriptors[trimmed].length };
     }
 
-    loadImage(path) {
-        return new Promise((resolve, reject) => {
-            const img = new Image();
-            img.crossOrigin = 'anonymous';
-            img.onload = () => resolve(img);
-            img.onerror = () => reject(new Error(`Failed to load: ${path}`));
-            img.src = path;
-        });
+    getCurrentCount(label) {
+        if (!label) return 0;
+        const trimmed = label.trim();
+        return this.labeledDescriptors[trimmed] ? this.labeledDescriptors[trimmed].length : 0;
+    }
+
+    savePerson(label) {
+        if (!label) throw new Error('No name provided.');
+        const trimmed = label.trim();
+        const count = this.getCurrentCount(trimmed);
+        if (count < 3) {
+            throw new Error(`Need at least 3 samples. Currently have ${count}.`);
+        }
+        return { label: trimmed, samples: count };
+    }
+
+    getPersonThumbnails(label) {
+        const trimmed = label.trim();
+        return this.thumbnails[trimmed] || [];
     }
 
     getTrainingStats() {
@@ -64,6 +78,7 @@ export class TrainingManager {
 
     clear() {
         this.labeledDescriptors = {};
+        this.thumbnails = {};
         this.detector.setTrainingData({});
     }
 }

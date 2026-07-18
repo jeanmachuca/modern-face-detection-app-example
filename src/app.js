@@ -2,30 +2,6 @@ import { CameraController } from './camera.js';
 import { FaceDetector } from './detection.js';
 import { TrainingManager } from './training.js';
 
-const TRAINING_IMAGES = [
-    { path: 'training-data/images/AW1.jpg', label: 'AW' },
-    { path: 'training-data/images/AW2.jpg', label: 'AW' },
-    { path: 'training-data/images/AW3.jpg', label: 'AW' },
-    { path: 'training-data/images/NG1.jpg', label: 'NG' },
-    { path: 'training-data/images/NG2.jpg', label: 'NG' },
-    { path: 'training-data/images/NG3.jpg', label: 'NG' },
-    { path: 'training-data/images/NG4.jpg', label: 'NG' },
-    { path: 'training-data/images/NG5.jpg', label: 'NG' },
-    { path: 'training-data/images/OW1.jpg', label: 'OW' },
-    { path: 'training-data/images/OW2.jpg', label: 'OW' },
-    { path: 'training-data/images/OW3.jpg', label: 'OW' },
-    { path: 'training-data/images/OW4.jpg', label: 'OW' },
-    { path: 'training-data/images/OW5.jpg', label: 'OW' },
-    { path: 'training-data/images/OW6.jpg', label: 'OW' },
-    { path: 'training-data/images/OW7.jpg', label: 'OW' },
-    { path: 'training-data/images/OW8.jpg', label: 'OW' },
-    { path: 'training-data/images/OW9.jpg', label: 'OW' },
-    { path: 'training-data/images/OW10.jpg', label: 'OW' },
-    { path: 'training-data/images/OW11.jpg', label: 'OW' },
-    { path: 'training-data/images/OW12.jpg', label: 'OW' },
-    { path: 'training-data/images/OW13.jpg', label: 'OW' },
-];
-
 class App {
     constructor() {
         this.video = document.getElementById('video');
@@ -60,8 +36,11 @@ class App {
 
     bindUI() {
         document.getElementById('btn-camera').addEventListener('click', () => this.toggleCamera());
-        document.getElementById('btn-train').addEventListener('click', () => this.trainFromImages());
+        document.getElementById('btn-capture').addEventListener('click', () => this.captureSample());
+        document.getElementById('btn-save-person').addEventListener('click', () => this.savePerson());
         document.getElementById('btn-clear').addEventListener('click', () => this.clearDatabase());
+
+        document.getElementById('input-name').addEventListener('input', () => this.updateCaptureUI());
         document.getElementById('model-select').addEventListener('change', (e) => {
             this.log('Switching model to ' + e.target.value, 'warn');
             this.loadModels(e.target.value);
@@ -100,7 +79,7 @@ class App {
             btn.textContent = 'Start Camera';
             this.setCameraStatus('off');
             this.log('Camera stopped', 'info');
-            document.getElementById('btn-train').disabled = true;
+            this.updateCaptureUI();
             return;
         }
 
@@ -112,7 +91,7 @@ class App {
             btn.textContent = 'Stop Camera';
             this.setCameraStatus('on');
             this.log('Camera started', 'success');
-            document.getElementById('btn-train').disabled = false;
+            this.updateCaptureUI();
             this.startDetection();
         } catch (error) {
             btn.textContent = 'Start Camera';
@@ -120,6 +99,26 @@ class App {
         }
 
         btn.disabled = false;
+    }
+
+    updateCaptureUI() {
+        const cameraOn = this.camera.active;
+        const name = document.getElementById('input-name').value.trim();
+        const count = this.training.getCurrentCount(name);
+        const canCapture = cameraOn && name.length > 0;
+
+        document.getElementById('btn-capture').disabled = !canCapture;
+
+        const countEl = document.getElementById('capture-count');
+        if (name.length > 0) {
+            countEl.textContent = `${count} / 3 min`;
+            countEl.style.color = count >= 3 ? '#4ade80' : '#fbbf24';
+        } else {
+            countEl.textContent = '';
+        }
+
+        document.getElementById('btn-save-person').disabled = !(count >= 3);
+        document.getElementById('input-name').disabled = !cameraOn;
     }
 
     startDetection() {
@@ -221,49 +220,55 @@ class App {
         }
     }
 
-    async trainFromImages() {
-        const btn = document.getElementById('btn-train');
-        btn.disabled = true;
-        btn.textContent = 'Training...';
+    async captureSample() {
+        const name = document.getElementById('input-name').value.trim();
+        if (!name) {
+            this.log('Enter a person name first.', 'error');
+            return;
+        }
 
-        this.log('Processing training images...', 'info');
+        const btn = document.getElementById('btn-capture');
+        btn.disabled = true;
 
         try {
-            const results = await this.training.processImages(TRAINING_IMAGES);
-            const stats = this.training.getTrainingStats();
-            this.log(`Trained: ${stats.totalPeople} people, ${stats.totalSamples} samples`, 'success');
-            stats.people.forEach(p => {
-                this.log(`  ${p.name}: ${p.samples} samples`, 'success');
-            });
-
-            if (this.camera.active) {
-                document.getElementById('btn-train').disabled = false;
-            }
+            const result = await this.training.captureFromVideo(this.video, name);
+            this.log(`Captured sample ${result.count} for "${result.label}"`, 'success');
         } catch (error) {
-            this.log('Training error: ' + error.message, 'error');
+            this.log(error.message, 'error');
         }
 
-        btn.textContent = 'Train from Images';
-        if (this.camera.active) {
-            btn.disabled = false;
+        this.updateCaptureUI();
+    }
+
+    savePerson() {
+        const name = document.getElementById('input-name').value.trim();
+        if (!name) return;
+
+        try {
+            const result = this.training.savePerson(name);
+            this.log(`Saved "${result.label}" with ${result.samples} samples`, 'success');
+        } catch (error) {
+            this.log(error.message, 'error');
+            return;
         }
+
+        document.getElementById('input-name').value = '';
+        this.updateCaptureUI();
         this.renderGallery();
     }
 
     clearDatabase() {
         this.training.clear();
         this.log('Training database cleared', 'warn');
+        this.updateCaptureUI();
         this.renderGallery();
-        if (this.camera.active) {
-            document.getElementById('btn-train').disabled = false;
-        }
     }
 
     renderGallery() {
         this.gallery.innerHTML = '';
 
         if (this.training.totalSamples === 0) {
-            this.gallery.innerHTML = '<p class="hint">No training data processed. Click "Train from Images" above.</p>';
+            this.gallery.innerHTML = '<p class="hint">No training data yet. Start camera, enter a name, and capture face samples.</p>';
             document.getElementById('btn-clear').disabled = true;
             return;
         }
@@ -273,8 +278,31 @@ class App {
         const stats = this.training.getTrainingStats();
         const info = document.createElement('p');
         info.className = 'hint';
-        info.textContent = `Database: ${stats.totalPeople} people, ${stats.totalSamples} total samples. Click person name to view images.`;
+        info.textContent = `Database: ${stats.totalPeople} people, ${stats.totalSamples} total samples.`;
         this.gallery.appendChild(info);
+
+        stats.people.forEach(person => {
+            const card = document.createElement('div');
+            card.className = 'person-card';
+
+            const header = document.createElement('div');
+            header.className = 'person-header';
+            header.textContent = `${person.name} (${person.samples})`;
+            card.appendChild(header);
+
+            const thumbs = document.createElement('div');
+            thumbs.className = 'person-thumbs';
+
+            this.training.getPersonThumbnails(person.name).forEach(src => {
+                const img = document.createElement('img');
+                img.src = src;
+                img.alt = person.name;
+                thumbs.appendChild(img);
+            });
+
+            card.appendChild(thumbs);
+            this.gallery.appendChild(card);
+        });
     }
 
     setModelStatus(text) {

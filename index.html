@@ -31,8 +31,16 @@
 
             <div id="controls">
                 <button id="btn-camera" class="btn btn-primary" disabled>Start Camera</button>
-                <button id="btn-train" class="btn btn-secondary">Train from Images</button>
                 <button id="btn-clear" class="btn btn-danger" disabled>Clear Database</button>
+
+                <div class="control-group">
+                    <label for="input-name">Person Name:</label>
+                    <input type="text" id="input-name" placeholder="Enter name" maxlength="20" disabled>
+                </div>
+
+                <button id="btn-capture" class="btn btn-secondary" disabled>Capture Face</button>
+                <span id="capture-count" class="capture-count"></span>
+                <button id="btn-save-person" class="btn btn-primary" disabled>Save Person</button>
 
                 <div class="control-group">
                     <label for="model-select">Detection Model:</label>
@@ -52,7 +60,7 @@
         <div id="training-section">
             <h2>Training Data</h2>
             <div id="image-gallery">
-                <p class="hint">Start camera and click "Train from Images" to process training images.</p>
+                <p class="hint">Start camera, enter a name, and capture at least 3 face samples per person.</p>
             </div>
         </div>
 

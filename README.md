@@ -1,5 +1,7 @@
 # Modern Face Detection App — Real-Time Training Tutorial
 
+[![Sponsor](https://img.shields.io/badge/Sponsor-GitHub-d81b60)](https://github.com/sponsors/jeanmachuca)
+
 A working face detection and recognition web app using **WebRTC** + **face-api.js** (TensorFlow.js). This tutorial walks you through how real-time face training works — capturing face samples from a live camera feed and building a recognition database on the fly.
 
 ## Features

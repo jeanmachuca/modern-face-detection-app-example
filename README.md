@@ -121,6 +121,7 @@ Camera Frame
 
 ## Related
 
+- **[face-gestures-detection-tutorial](https://github.com/jeanmachuca/face-gestures-detection-tutorial)** — Gesture detection tutorial: expressions, hands, eyes, head ([live demo](https://jeanmachuca.github.io/modern-face-gestures-detection-app-example/))
 - **[face-detection-tutorial](https://github.com/jeanmachuca/face-detection-tutorial)** — Comprehensive tutorial ([live](https://jeanmachuca.github.io/face-detection-tutorial/))
 - **[facerecognitioninbrowser](https://github.com/jeanmachuca/facerecognitioninbrowser)** — Original Flash project ([live](https://jeanmachuca.github.io/facerecognitioninbrowser/))
 

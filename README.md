@@ -4,6 +4,10 @@
 
 A working face detection and recognition web app using **WebRTC** + **face-api.js** (TensorFlow.js). This tutorial walks you through how real-time face training works — capturing face samples from a live camera feed and building a recognition database on the fly.
 
+## Live Demo
+
+**[https://jeanmachuca.github.io/modern-face-detection-app-example/](https://jeanmachuca.github.io/modern-face-detection-app-example/)**
+
 ## Features
 
 - Real-time face detection via webcam

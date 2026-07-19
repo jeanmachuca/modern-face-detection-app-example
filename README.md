@@ -121,7 +121,7 @@ Camera Frame
 
 ## Related
 
-- **[facedetection-tutorial](https://github.com/jeanmachuca/facedetection-tutotial)** — Comprehensive tutorial ([live](https://jeanmachuca.github.io/facedetection-tutotial/))
+- **[face-detection-tutorial](https://github.com/jeanmachuca/face-detection-tutorial)** — Comprehensive tutorial ([live](https://jeanmachuca.github.io/face-detection-tutorial/))
 - **[facerecognitioninbrowser](https://github.com/jeanmachuca/facerecognitioninbrowser)** — Original Flash project ([live](https://jeanmachuca.github.io/facerecognitioninbrowser/))
 
 ## License
